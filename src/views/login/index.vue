@@ -1,6 +1,8 @@
 <template>
   <div class="login-container">
-    <van-nav-bar class="nav-bar" title="登录" />
+    <van-nav-bar class="nav-bar" title="登录">
+      <van-icon slot="left" name="cross" @click="$router.back()"></van-icon>
+    </van-nav-bar>
     <van-form ref="loginForm" @submit="onSubmit">
       <van-field v-model="user.mobile" :rules="userFormRules.mobile" maxlength="11" name="mobile" placeholder="请输入手机号">
         <i slot="left-icon" class="toutiao toutiao-shouji"></i>
@@ -20,7 +22,7 @@
 </template>
 
 <script>
-import { login } from '@/api/user.js'
+import { login, sendSms } from '@/api/user.js'
 export default {
   name: 'LoginIndexs',
   components: {},
@@ -61,6 +63,7 @@ export default {
         const { data } = await login(this.user)
         this.$store.commit('setUser', data.data)
         this.$toast.success('登录成功')
+        this.$router.back()
       } catch (err) {
         if (err.response.status === 400) {
           // console.log('手机号或者验证码错误 ！', err)
@@ -78,6 +81,18 @@ export default {
         return console.log('验证失败', err)
       }
       this.isCountDownShow = true
+
+      try {
+        await sendSms(this.user.mobile)
+        this.$toast('发送成功')
+      } catch (err) {
+        this.isCountDownShow = false
+        if (err.response.status === 429) {
+          this.$toast('发送太频繁了， 请稍后再重试')
+        } else {
+          this.$toast('发送失败， 请稍后再重试')
+        }
+      }
     }
   }
 }

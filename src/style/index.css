@@ -81,6 +81,7 @@ body {
 .nav-bar {
   background-color: #3296fa;
 }
-.nav-bar /deep/ .van-nav-bar__title {
+.nav-bar /deep/ .van-nav-bar__title,
+.nav-bar .van-icon {
   color: #fff;
 }
