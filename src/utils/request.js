@@ -3,13 +3,12 @@ import store from '@/store'
 const request = axios.create({
   baseURL: 'http://ttapi.research.itcast.cn/'
 })
-
 request.interceptors.request.use(function (config) {
   const { user } = store.state
   if (user && user.token) {
-    config.headers.Authorization = `Bearer ${store.state.user.token}`
+    config.headers.Authorization = `Bearer ${user.token}`
   }
-  console.log(config)
+  // console.log(config)
   return config
 }, function (error) {
   return Promise.reject(error)
