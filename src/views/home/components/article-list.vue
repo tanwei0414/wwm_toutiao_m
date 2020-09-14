@@ -57,7 +57,7 @@ export default {
         // }
 
         const { results } = data.data
-        console.log(results)
+        // console.log(results)
         this.list.push(...results)
         this.loading = false
 

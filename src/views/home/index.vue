@@ -23,30 +23,41 @@
         <article-list ref="article-list" :channel="channel" />
       </van-tab>
       <div slot="nav-right" class="placeholder"></div>
-      <div slot="nav-right" class="hamburger-btn">
+      <div slot="nav-right" class="hamburger-btn" @click="isChennelEditShow = true">
         <i class="toutiao toutiao-gengduo"></i>
       </div>
     </van-tabs>
+
+    <van-popup v-model="isChennelEditShow" closeable close-icon-position="top-left" position="bottom" :style="{ height: '100%' }" >
+      <channel-edit :my-channels="channels" :active="active" @update-active="onUpdateArticle" />
+    </van-popup>
   </div>
 </template>
 
 <script>
 import { getUserChannels } from '@/api/user'
 import ArticleList from './components/article-list'
+import ChannelEdit from './components/channel-edit.vue'
+import { mapState } from 'vuex'
+import { getItem } from '@/utils/storage'
 
 export default {
   name: 'HomeIndex',
   components: {
-    ArticleList
+    ArticleList,
+    ChannelEdit
   },
   props: {},
   data () {
     return {
       active: 0,
-      channels: []
+      channels: [],
+      isChennelEditShow: false
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {},
   created () {
     this.loadChannels()
@@ -54,13 +65,35 @@ export default {
   mounted () {},
   methods: {
     async loadChannels () {
+      // try {
+      //   const { data } = await getUserChannels()
+      //   this.channels = data.data.channels
+      //   // console.log(this.channels)
+      // } catch (err) {
+      //   this.$toast('获取频道列表数据失败 ！')
+      // }
       try {
-        const { data } = await getUserChannels()
-        this.channels = data.data.channels
-        // console.log(this.channels)
+        let channels = []
+        if (this.user) {
+          const { data } = await getUserChannels()
+          channels = data.data.channels
+        } else {
+          const localChannels = getItem('TOUTIAO_CHANNELS')
+          if (localChannels) {
+            channels = localChannels
+          } else {
+            const { data } = await getUserChannels()
+            channels = data.data.channels
+          }
+        }
+        this.channels = channels
       } catch (err) {
-        this.$toast('获取频道列表数据失败 ！')
+        this.$toast('获取频道数据失败')
       }
+    },
+    onUpdateArticle (index, isChennelEditShow = true) {
+      this.active = index
+      this.isChennelEditShow = isChennelEditShow
     }
   }
 }
