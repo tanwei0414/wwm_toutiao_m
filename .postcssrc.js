@@ -8,7 +8,8 @@ module.exports = {
         // console.log('处理的css:',file)
         return file.indexOf('vant') !== -1 ? 37.5 : 75
       },
-      propList: ['*']
+      propList: ['*'],
+      exclude: 'github-markdown'
     }
   }
 }
